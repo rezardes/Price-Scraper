@@ -5,8 +5,10 @@
 </head>
 <body>
 	<h1>Cari Produk</h1>
-	<form>
-		<input type="text" name="search" placeholder="search..">
+	<form method="GET" action="/search/">
+		<label for="q">
+		<input type="text" name="q" id="q" placeholder="search.." />
+		<input type="submit" value="submit" />
 	</form>
 </body>
 </html>
