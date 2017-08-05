@@ -20,6 +20,8 @@ from . import views
 
 urlpatterns = [
 	url(r'^$', views.index, name='index'),
+    url(r'^download/(?P<path>.*)$', views.download, name='download'),
 	url(r'^search/', include('search.urls')),
     url(r'^admin/', admin.site.urls),
+    #url(r'^download/(?P<path>.*)$', serve, {'document_root': settings.MEDIA_ROOT}),
 ]
