@@ -1,6 +1,8 @@
 from django.template import Context, loader
 from django.http import HttpResponse
 
+import json
+
 from urllib.request import urlopen
 from urllib.error import HTTPError
 from bs4 import BeautifulSoup
@@ -20,40 +22,54 @@ def getSource(url):
 
 class Product(object):
 	"""docstring for Product"""
-	def __init__(self, name, price):
+	def __init__(self, name, price, link):
 		self.name = name
 		self.price = price
+		self.link = link
 
-def getProduct(soup):
+def getProductBukalapak(soup):
 	hasil = []
 	counter = 0
 	price_src = soup.find_all("div","product-price")
+	image_src = soup.find_all("picture","product-picture")
+	#print(image_src)
 	for name in soup.find_all("div","product-description"):
-		hasil.append(Product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"]))
+		hasil.append(Product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"],image_src[counter].find("img")["data-src"]))
 		counter = counter+1
 	return hasil
-'''
-def getTitle(soup):
-	hasil = []
-	for title in soup.find_all("div","product-description"):
-		hasil.append(title.h3.a.get_text())
-	return hasil
 
-def getPrice(soup):
+def getProductLazada(soup):
 	hasil = []
-	for harga in soup.find_all("div","product-price"):
-		hasil.append(harga["data-reduced-price"])
+	json_string=soup.head.find("script").get_text()
+	parsed_json = json.loads(json_string)
+	print(len(parsed_json["itemListElement"]))
+	itemListElement = parsed_json["itemListElement"]
+	for item in itemListElement:
+		product_name = item["name"]
+		product_img = item["image"]
+		product_price = item["offers"]["price"]
+		hasil.append( Product(product_name,product_price,product_img) )
 	return hasil
-'''
-
+	'''
+	for script in script_list:
+		print(script)
+	'''
 # Create your views here.
 def index(request):
+	search_text = request.GET.get('q','')
+	search_text = search_text.replace(' ','+')
 	template = loader.get_template("search\searching.html")
-	soup = getSource("https://www.bukalapak.com/products?utf8=%E2%9C%93&source=navbar&from=omnisearch&search_source=omnisearch_organic&search[keywords]=kangguru")
-	
-	product_list = getProduct(soup)
+	print(search_text)
+	soup = getSource("https://www.bukalapak.com/products?utf8=%E2%9C%93&source=navbar&from=omnisearch&search_source=omnisearch_organic&search[keywords]="+search_text)
+	soup2 = getSource("http://www.lazada.co.id/catalog/?q="+search_text)
+	lazada_list = getProductLazada(soup2)
+	bukalapak_list = getProductBukalapak(soup)
+	#product_list = getProduct(soup)
 
+	
 	context = {
-		'product_list': product_list,
+		'lazada_list': lazada_list,
+		'bukalapak_list': bukalapak_list,
 	}
+	
 	return HttpResponse(template.render(context,request))
