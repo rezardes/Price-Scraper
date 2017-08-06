@@ -9,7 +9,7 @@ from urllib.error import HTTPError
 from bs4 import BeautifulSoup
 
 from .populate import add_product
-from .models import Produk
+from .models import BProduk, LProduk
 
 #from .scraping import bukalapak
 
@@ -38,22 +38,24 @@ def getProductBukalapak(soup):
 	image_src = soup.find_all("picture","product-picture")
 	#print(image_src)
 	for name in soup.find_all("div","product-description"):
-		add_product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"],image_src[counter].find("img")["data-src"])
+		add_product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"],
+			image_src[counter].find("img")["data-src"],"bukalapak")
 		counter = counter+1
-	return Produk.objects.order_by('price')
+	return BProduk.objects.order_by("price")
 
 def getProductLazada(soup):
-	hasil = []
+	#hasil = []
 	json_string=soup.head.find("script").get_text()
 	parsed_json = json.loads(json_string)
-	print(len(parsed_json["itemListElement"]))
+	#print(len(parsed_json["itemListElement"]))
 	itemListElement = parsed_json["itemListElement"]
 	for item in itemListElement:
 		product_name = item["name"]
 		product_img = item["image"]
 		product_price = item["offers"]["price"]
-		hasil.append( Product(product_name,product_price,product_img) )
-	return hasil
+		add_product(product_name,product_price[:-3],product_img,"lazada")
+		#hasil.append( Product(product_name,product_price,product_img) )
+	return LProduk.objects.order_by("price")
 	'''
 	for script in script_list:
 		print(script)
