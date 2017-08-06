@@ -1,11 +1,15 @@
 from django.template import Context, loader
 from django.http import HttpResponse
+from django.db import models
 
 import json
 
 from urllib.request import urlopen
 from urllib.error import HTTPError
 from bs4 import BeautifulSoup
+
+from .populate import add_product
+from .models import Produk
 
 #from .scraping import bukalapak
 
@@ -28,15 +32,15 @@ class Product(object):
 		self.link = link
 
 def getProductBukalapak(soup):
-	hasil = []
+	#hasil = []
 	counter = 0
 	price_src = soup.find_all("div","product-price")
 	image_src = soup.find_all("picture","product-picture")
 	#print(image_src)
 	for name in soup.find_all("div","product-description"):
-		hasil.append(Product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"],image_src[counter].find("img")["data-src"]))
+		add_product(name.h3.a.get_text(),price_src[counter]["data-reduced-price"],image_src[counter].find("img")["data-src"])
 		counter = counter+1
-	return hasil
+	return Produk.objects.order_by('price')
 
 def getProductLazada(soup):
 	hasil = []
@@ -58,7 +62,7 @@ def getProductLazada(soup):
 def index(request):
 	search_text = request.GET.get('q','')
 	search_text = search_text.replace(' ','+')
-	template = loader.get_template("search\searching.html")
+	template = loader.get_template("search/searching.html")
 	print(search_text)
 	soup = getSource("https://www.bukalapak.com/products?utf8=%E2%9C%93&source=navbar&from=omnisearch&search_source=omnisearch_organic&search[keywords]="+search_text)
 	soup2 = getSource("http://www.lazada.co.id/catalog/?q="+search_text)
@@ -66,7 +70,6 @@ def index(request):
 	bukalapak_list = getProductBukalapak(soup)
 	#product_list = getProduct(soup)
 
-	
 	context = {
 		'lazada_list': lazada_list,
 		'bukalapak_list': bukalapak_list,
