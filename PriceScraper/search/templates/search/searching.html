@@ -2,29 +2,47 @@
 <html>
 <head>
 	<title>Searching</title>
+	<style type="text/css">
+		h1 {
+			text-align: center;
+		}
+		#center {
+			text-align: center;
+		}
+		form {
+			margin-top: 10px; margin-left: 560px
+		}
+	</style>
 </head>
 <body>
-	<h1>Hasil Searching:</h1>
+	<h1>Hasil Searching</h1>
 	{% load static %}
+	<p id="center"> Unduh dalam CSV: </p>
+	<form method="GET" action="/unduh/bukalapak.csv">
+		<input type="submit" value="bukalapak">
+	</form>
+	<form method="GET" action="/unduh/lazada.csv">
+		<input type="submit" value="lazada">
+	</form>
+	<p id="center"> Unduh dalam SQL: </p>
+	<form method="GET" action="/unduh/db.sqlite3">
+		<input type="submit" value="download">
+	</form>
+
+	<p id="center"> Hasil scraping: </p>
+	
 	<img src="{% static "bukalapak.jpg" %}" alt="bukalapak" height="100" weight="100" />
 	<br />
 	{% for product in bukalapak_list %}
-		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 		<p>{{ product.name }} : Rp{{ product.price }}</p>
+		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 	{% endfor %}
 	<img src="{% static "lazada.jpg" %}" alt="lazada" height="100" weight="100" />
 	<br />
 	{% for product in lazada_list %}
-		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 		<p>{{ product.name }} : Rp{{ product.price }}</p>
+		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 	{% endfor %}
-	<form method="GET" action="/unduh/bukalapak.csv">
-		Unduh produk bukalapak dalam CSV:
-		<input type="submit" value="download">
-	</form>
-	<form method="GET" action="/unduh/lazada.csv">
-		Unduh produk lazada dalam CSV:
-		<input type="submit" value="download">
-	</form>
+	
 </body>
 </html>
