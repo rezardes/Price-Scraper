@@ -28,28 +28,25 @@ def index(request):
 	}
 	return HttpResponse(template.render(context,request))
 
-def unduh(request):
+def unduh(request,path):
 
 	BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-	file_path = os.path.join(BASE_DIR, 'names.csv')
+	file_path = os.path.join(BASE_DIR, path)
 	print(file_path)
-	'''
-	with open(file_path, 'w') as csvfile:
-		fieldnames = ['first_name', 'last_name']
-		writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-		writer.writeheader()
-		writer.writerow({'first_name': 'Baked', 'last_name': 'Beans'})
-		writer.writerow({'first_name': 'Lovely', 'last_name': 'Spam'})
-		writer.writerow({'first_name': 'Wonderful', 'last_name': 'Spam'})
-	'''
+
 	response = HttpResponse(content_type='text/csv')
-	response['Content-Disposition'] = 'attachment; filename="bukalapak.csv"'
+	response['Content-Disposition'] = 'attachment; filename='+path
 
 	writer = csv.writer(response)
 	writer.writerow(['Produk', 'Harga', 'Link Gambar'])
 	daftar = []
-	bukalapak_list = BProduk.objects.order_by("price")
-	for product in bukalapak_list:
+	product_list = []
+	if (path == "bukalapak.csv"):
+		product_list = BProduk.objects.order_by("price")
+	else:
+		product_list = LProduk.objects.order_by("price")
+
+	for product in product_list:
 		daftar.append(product.name)
 		daftar.append(product.price)
 		daftar.append(product.imageURL)

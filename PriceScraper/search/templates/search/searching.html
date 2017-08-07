@@ -16,5 +16,13 @@
 		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 		<p>{{ product.name }} : Rp{{ product.price }}</p>
 	{% endfor %}
+	<form method="GET" action="/unduh/bukalapak.csv">
+		Unduh produk bukalapak dalam CSV:
+		<input type="submit" value="download">
+	</form>
+	<form method="GET" action="/unduh/lazada.csv">
+		Unduh produk lazada dalam CSV:
+		<input type="submit" value="download">
+	</form>
 </body>
 </html>
