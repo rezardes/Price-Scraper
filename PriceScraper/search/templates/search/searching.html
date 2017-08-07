@@ -6,12 +6,13 @@
 <body>
 	<h1>Hasil Searching:</h1>
 	{% load static %}
-	<img src="{% static "bukalapak.jpg" %}" alt="bukalapak" />
+	<img src="{% static "bukalapak.jpg" %}" alt="bukalapak" height="100" weight="100" />
 	<br />
 	{% for product in bukalapak_list %}
 		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 		<p>{{ product.name }} : Rp{{ product.price }}</p>
 	{% endfor %}
+	<img src="{% static "lazada.jpg" %}" alt="lazada" height="100" weight="100" />
 	{% for product in lazada_list %}
 		<img src={{product.imageURL}} alt={{product.name}} height="100" weight="100">
 		<p>{{ product.name }} : Rp{{ product.price }}</p>
